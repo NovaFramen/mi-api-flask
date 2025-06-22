@@ -1,10 +1,155 @@
-from flask import Flask, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, request, jsonify, render_template
+import psycopg2
+
 
 app = Flask(__name__)
+
+DATABASE_URL = "postgresql://komicuser:yJh4z95SKQh9ti71MK1bwd4zekbg4ZVz@dpg-d1bkdt8dl3ps73epp700-a.oregon-postgres.render.com/komicdb"
+
+def get_db_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
 
 @app.route('/')
 def home():
     return jsonify({"mensaje": "¡Hola desde Render con Flask!"})
 
+@app.route('/create_table')
+def create_table():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(150) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL
+        );
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"mensaje": "Tabla usuarios creada o ya existente"})
+
+
+
+
+
+
+from werkzeug.security import generate_password_hash, check_password_hash
+
+@app.route('/form')
+def form():
+    return render_template('formulario.html')
+
+
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    if not username or not password:
+        return jsonify({"error": "Faltan username o password"}), 400
+
+    hashed_password = generate_password_hash(password)
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO usuarios (username, password) VALUES (%s, %s)", (username, hashed_password))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({"mensaje": "Usuario registrado correctamente"})
+    except psycopg2.errors.UniqueViolation:
+        return jsonify({"error": "El username ya existe"}), 409
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+
+
+@app.route('/sesion')
+def login_form():
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.is_json:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+    else:
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+    if not username or not password:
+        return jsonify({"error": "Faltan username o password"}), 400
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT password FROM usuarios WHERE username = %s", (username,))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if user and check_password_hash(user[0], password):
+            return jsonify({"mensaje": "Login exitoso"})
+        else:
+            return jsonify({"error": "Usuario o contraseña incorrectos"}), 401
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+
+
+
+
+@app.route('/drop_table')
+def drop_table():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("DROP TABLE IF EXISTS usuarios;")
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"mensaje": "Tabla usuarios eliminada"})
+
+
+
+@app.route('/listar', methods=['GET'])
+def listar_usuarios():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, username, password FROM usuarios;")
+    usuarios = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    resultado = []
+    for usuario in usuarios:
+        resultado.append({
+            "id": usuario[0],
+            "username": usuario[1],
+            "password": usuario[2]
+        })
+
+    return jsonify(resultado)
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
+
+
