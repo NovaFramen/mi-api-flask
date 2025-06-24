@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 
 DATABASE_URL = "postgresql://postgres:komic2025!db@db.jeboojuntugrognjvlzc.supabase.co:5432/postgres"
-#DATABASE_URL = os.environ.get("postgresql://postgres:komic2025!db@db.jeboojuntugrognjvlzc.supabase.co:5432/postgres")
+
 
 
 SUPABASE_URL = "https://jeboojuntugrognjvlzc.supabase.co"
