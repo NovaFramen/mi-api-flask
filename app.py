@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 
 DATABASE_URL = "postgresql://postgres:komic2025!db@db.jeboojuntugrognjvlzc.supabase.co:5432/postgres"
+#DATABASE_URL = os.environ.get("postgresql://postgres:komic2025!db@db.jeboojuntugrognjvlzc.supabase.co:5432/postgres")
 
 
 SUPABASE_URL = "https://jeboojuntugrognjvlzc.supabase.co"
@@ -220,6 +221,7 @@ def hospitales_geojson():
             FROM hospital;
         """)
         rows = cur.fetchall()
+        print(f"Datos recibidos: {rows}")  # 👈 Esto lo verás en los logs
         cur.close()
         conn.close()
 
@@ -243,6 +245,7 @@ def hospitales_geojson():
         }
         return jsonify(geojson)
     except Exception as e:
+        print(f"Error en hospitales_geojson: {str(e)}")  # 👈 También en logs de Render
         return jsonify({"error": str(e)}), 500
 
 

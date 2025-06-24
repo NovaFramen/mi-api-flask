@@ -33,8 +33,9 @@
     }).addTo(map);
 
     // 🔴 1. Mostrar hospitales desde API
-    fetch('/hospitales_geojson')
-      .then(response => response.json())
+  //  fetch('/hospitales_geojson')
+  fetch('https://komic-flask.onrender.com/hospitales_geojson') 
+       .then(response => response.json())
       .then(data => {
         L.geoJSON(data, {
           onEachFeature: function (feature, layer) {
