@@ -2,6 +2,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, request, jsonify, render_template
 from supabase import create_client, Client
 import psycopg2
+import json
+
 import os
 
 
@@ -9,7 +11,7 @@ app = Flask(__name__)
 
 
 
-DATABASE_URL = "postgresql://komicuser:yJh4z95SKQh9ti71MK1bwd4zekbg4ZVz@dpg-d1bkdt8dl3ps73epp700-a.oregon-postgres.render.com/komicdb"
+DATABASE_URL = "postgresql://postgres:komic2025!db@db.jeboojuntugrognjvlzc.supabase.co:5432/postgres"
 
 
 SUPABASE_URL = "https://jeboojuntugrognjvlzc.supabase.co"
@@ -201,6 +203,71 @@ def ver_pdf():
     return render_template('mostrarpdf.html', url=url)
 
 
+@app.route('/mapa')
+def mapa():
+    return render_template('mapa.html')
+
+
+
+
+@app.route('/hospitales_geojson', methods=['GET'])
+def hospitales_geojson():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, ST_AsGeoJSON(geom) AS geometry, nombre, descrip
+            FROM hospital;
+        """)
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        features = []
+        for row in rows:
+            geometry = row[1]
+            if geometry:
+                features.append({
+                    "type": "Feature",
+                    "geometry": json.loads(geometry),
+                    "properties": {
+                        "id": row[0],
+                        "nombre": row[2],
+                        "descrip": row[3]
+                    }
+                })
+
+        geojson = {
+            "type": "FeatureCollection",
+            "features": features
+        }
+        return jsonify(geojson)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+@app.route('/tablas')
+def listar_tablas():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT table_name FROM information_schema.tables
+            WHERE table_schema = 'public';
+        """)
+        tablas = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        return jsonify([t[0] for t in tablas])
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/ciudad')
+def ver_ciudad():
+    return render_template('ciudad.html')
 
 
 

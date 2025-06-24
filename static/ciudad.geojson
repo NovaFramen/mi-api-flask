@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "ciudad",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "nombre": "el alto" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -68.218298080682445, -16.50630756065955 ], [ -68.233652283455385, -16.496186310990421 ], [ -68.182791486770043, -16.469347101580052 ], [ -68.16247915601835, -16.503087220490659 ], [ -68.218298080682445, -16.50630756065955 ] ] ] ] } }
+]
+}

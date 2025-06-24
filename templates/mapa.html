@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mapa de Hospitales y Ciudad</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; }
+    button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <button onclick="centrarCiudad()">Ver área delimitada</button>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([-17.3939, -66.1653], 13); // Punto inicial (Cochabamba por ejemplo)
+
+    // Capa base
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 🔴 1. Mostrar hospitales desde API
+    fetch('/hospitales_geojson')
+      .then(response => response.json())
+      .then(data => {
+        L.geoJSON(data, {
+          onEachFeature: function (feature, layer) {
+            const props = feature.properties;
+            layer.bindPopup(`<b>${props.nombre}</b><br>${props.descrip}`);
+          }
+        }).addTo(map);
+      });
+
+    // 🔵 2. Mostrar área delimitada desde archivo GeoJSON
+    let capaCiudad = null;
+
+    fetch('/static/ciudad.geojson')
+      .then(res => res.json())
+      .then(data => {
+        capaCiudad = L.geoJSON(data, {
+          style: {
+            color: 'red',
+            fillColor: 'transparent',  // O usa fillOpacity: 0
+            fillOpacity: 0,
+            weight: 2
+          },
+          onEachFeature: function (feature, layer) {
+            if (feature.properties && feature.properties.nombre) {
+              layer.bindPopup(feature.properties.nombre);
+            }
+          }
+        }).addTo(map);
+      });
+
+    // 🟡 3. Función del botón para centrar la ciudad
+    function centrarCiudad() {
+      if (capaCiudad) {
+        map.fitBounds(capaCiudad.getBounds());
+      } else {
+        alert("Aún no se ha cargado el área.");
+      }
+    }
+  </script>
+</body>
+</html>
