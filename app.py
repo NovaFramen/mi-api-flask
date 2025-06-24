@@ -11,8 +11,8 @@ app = Flask(__name__)
 
 
 
-DATABASE_URL = "postgresql://postgres:komic2025!db@db.jeboojuntugrognjvlzc.supabase.co:5432/postgres"
-
+#DATABASE_URL = "postgresql://postgres:komic2025!db@db.jeboojuntugrognjvlzc.supabase.co:5432/postgres"
+DATABASE_URL = "postgresql://postgres.jeboojuntugrognjvlzc:komic2025!db@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
 
 
 SUPABASE_URL = "https://jeboojuntugrognjvlzc.supabase.co"
