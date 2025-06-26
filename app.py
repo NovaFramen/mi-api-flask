@@ -1,5 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template,redirect,url_for
 from supabase import create_client, Client
 import psycopg2
 import json
@@ -13,6 +13,7 @@ app = Flask(__name__)
 
 #DATABASE_URL = "postgresql://postgres:komic2025!db@db.jeboojuntugrognjvlzc.supabase.co:5432/postgres"
 DATABASE_URL = "postgresql://postgres.jeboojuntugrognjvlzc:komic2025!db@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
+DATABASE_URL0 = "postgresql://komicuser:yJh4z95SKQh9ti71MK1bwd4zekbg4ZVz@dpg-d1bkdt8dl3ps73epp700-a.oregon-postgres.render.com:5432/komicdb"
 
 
 SUPABASE_URL = "https://jeboojuntugrognjvlzc.supabase.co"
@@ -26,7 +27,9 @@ def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL)
     return conn
 
-
+def get_db_connection0():
+    conn = psycopg2.connect(DATABASE_URL0)
+    return conn
 
 
 @app.route('/subir', methods=['POST'])
@@ -102,13 +105,16 @@ def signup():
     hashed_password = generate_password_hash(password)
 
     try:
-        conn = get_db_connection()
+        conn = get_db_connection0()
         cur = conn.cursor()
         cur.execute("INSERT INTO usuarios (username, password) VALUES (%s, %s)", (username, hashed_password))
         conn.commit()
         cur.close()
         conn.close()
-        return jsonify({"mensaje": "Usuario registrado correctamente"})
+        # return jsonify({"mensaje": "Usuario registrado correctamente"})
+    
+        return redirect(url_for('login_form'))
+
     except psycopg2.errors.UniqueViolation:
         return jsonify({"error": "El username ya existe"}), 409
     except Exception as e:
@@ -136,7 +142,7 @@ def login():
         return jsonify({"error": "Faltan username o password"}), 400
 
     try:
-        conn = get_db_connection()
+        conn = get_db_connection0()
         cur = conn.cursor()
         cur.execute("SELECT password FROM usuarios WHERE username = %s", (username,))
         user = cur.fetchone()
@@ -144,7 +150,10 @@ def login():
         conn.close()
 
         if user and check_password_hash(user[0], password):
-            return jsonify({"mensaje": "Login exitoso"})
+            
+
+            #  return redirect(url_for('mapa'))
+            return redirect(url_for('ver_pdf'))
         else:
             return jsonify({"error": "Usuario o contraseña incorrectos"}), 401
     except Exception as e:
@@ -158,7 +167,7 @@ def login():
 
 @app.route('/drop_table')
 def drop_table():
-    conn = get_db_connection()
+    conn = get_db_connection0()
     cur = conn.cursor()
     cur.execute("DROP TABLE IF EXISTS usuarios;")
     conn.commit()
@@ -170,7 +179,7 @@ def drop_table():
 
 @app.route('/listar', methods=['GET'])
 def listar_usuarios():
-    conn = get_db_connection()
+    conn = get_db_connection0()
     cur = conn.cursor()
     cur.execute("SELECT id, username, password FROM usuarios;")
     usuarios = cur.fetchall()
@@ -272,6 +281,26 @@ def listar_tablas():
 def ver_ciudad():
     return render_template('ciudad.html')
 
+# encabezados
+
+@app.route('/sobre')
+def sobre():
+    return render_template('about.html')
+
+
+@app.route('/servicios')
+def servicios():
+    return render_template('servicios.html')
+
+
+@app.route('/catalogo')
+def catalogo():
+    return render_template('catalogo.html')
+
+
+@app.route('/contacto')
+def contacto():
+    return render_template('contacto.html')
 
 
 

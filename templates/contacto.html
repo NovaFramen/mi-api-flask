@@ -26,28 +26,60 @@
             </svg>
         </div>
         <ul class="nav-list">
-           <li><a href="#hogar">Hogar</a></li>
+
+            <li><a href="{{ url_for('ver_pdf') }}">Hogar</a></li>
             <li><a href="{{ url_for('sobre') }}">Sobre</a></li>
             <li><a href="{{ url_for('servicios') }}">Servicio</a></li>
             <li><a href="{{ url_for('catalogo') }}">Catalogo</a></li>
-            <li><a href="{{ url_for('contacto') }}">Contacto</a></li>
+            <li><a href="#contacto">Contacto</a></li>
         </ul>
     </nav>
 
     <main class="main-content">
-        <h1 class="big-title">El baúl cómico</h1>
-        <div class="content-section">
-            <p>Bienvenido a un mundo lleno de historias ilustradas.</p>
-        </div>
+        <h1 class="big-title">Contacto</h1>
 
-        <div class="cards-container">
+        <p style="text-align: justify; max-width: 900px; margin: 0 auto;">
+            En <strong>El baúl cómico</strong> ofrecemos una variedad de servicios para todos los amantes del cómic, ya
+            seas lector, coleccionista o creador independiente.
+            Nuestra plataforma está diseñada para brindarte acceso fácil, seguro y emocionante al mundo de las
+            historietas.
+        </p>
+
+        <p style="text-align: justify; max-width: 900px; margin: 0 auto;">
+            <strong>1. Biblioteca Digital:</strong> Accede a una colección de cómics en formato PDF disponibles para
+            lectura en línea o descarga. Contamos con clásicos, novedades y contenido independiente.
+        </p>
+
+        <p style="text-align: justify; max-width: 900px; margin: 0 auto;">
+            <strong>2. Venta de Cómics:</strong> Puedes adquirir tus historietas favoritas directamente desde la
+            plataforma de forma rápida y segura. Cada cómic incluye una vista previa antes de comprar.
+        </p>
+
+        <p style="text-align: justify; max-width: 900px; margin: 0 auto;">
+            <strong>3. Publicación de Cómics:</strong> Si eres autor, te ayudamos a publicar y compartir tu obra con
+            nuestra comunidad. Solo necesitas registrarte y subir tu contenido.
+        </p>
+
+        <p style="text-align: justify; max-width: 900px; margin: 0 auto;">
+            <strong>4. Comunidad de Lectores:</strong> Conéctate con otros fanáticos del cómic, deja reseñas, participa
+            en foros y conoce recomendaciones personalizadas según tus gustos.
+        </p>
+
+        <p style="text-align: justify; max-width: 900px; margin: 0 auto;">
+            En El baúl cómico, nos comprometemos a hacer del cómic una experiencia accesible, entretenida y
+            colaborativa. ¡Explora, lee, crea y comparte!
+        </p>
+
+        <!-- </div> -->
+
+        <!-- <div class="cards-container">
             <div class="card">
                 <h3>Spiderman</h3>
                 <p>Sinopsis de Hombre Araña
                     Un hombre común obtiene poderes arácnidos tras un accidente y decide usarlos para proteger su ciudad
                     del crimen. Pero mantener su doble vida y enfrentar peligros lo llevará al límite..</p>
-                <!--  <iframe src="{{ url }}" width="100%" height="600px"></iframe> 
-                <img src="./static/img.jpg" height="90" width="100">-->
+                 <iframe src="{{ url }}" width="100%" height="600px"></iframe> 
+                <img src="./static/img.jpg" height="90" width="100">
 
                 <br><br>
                 <a href="{{ url }}" target="_blank" class="ver-pdf-btn">COMPRAR</a>
@@ -74,11 +106,8 @@
             <p>Sumérgete en un universo lleno de aventuras, humor, acción y emoción. Aquí encontrarás cómics para todos
                 los gustos: desde héroes urbanos y animales parlantes hasta mundos futuristas y tramas fantásticas.</p>
 
-        </div>
+        </div> -->
     </main>
-
-
-
 
     <svg id="svgfilters2" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
         xmlns:svgjs="http://svgjs.dev/svgjs" viewBox="0 0 700 700" width="700" height="700">
@@ -98,14 +127,6 @@
         <rect width="700" height="700" fill="#1c1818ff"></rect>
         <rect width="700" height="700" fill="#dfdde1" filter="url(#nnnoise-filter)"></rect>
     </svg>
-
-
-
-
-
-
-
-
 
 
 </body>

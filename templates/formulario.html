@@ -1,17 +1,44 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Formulario de registro</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='formregistro.css') }}">
 </head>
+
+
+
+
 <body>
-    <h2>Formulario de registro</h2>
-    <form method="POST" action="/signup">
-        <label>Usuario:</label><br>
-        <input type="text" name="username"><br>
-        <label>Contraseña:</label><br>
-        <input type="password" name="password"><br><br>
-        <input type="submit" value="Registrar">
-    </form>
+
+    <div class="login-box">
+        <h2>Formulario de registro</h2>
+        <form method="POST" action="/signup">
+
+            <div class="user-box">
+                <label>Usuario:</label><br><br>
+                <input type="text" name="username">
+            </div>
+
+            <div class="user-box">
+                <label>Contraseña:</label><br><br>
+                <input type="password" name="password">
+            </div>
+
+
+
+            <a href="#" onclick="this.closest('form').submit(); return false;">
+                Registrase
+                <span></span><span></span><span></span><span></span>
+            </a>
+           
+
+        </form>
+
+    </div>
 </body>
+
+
 </html>
