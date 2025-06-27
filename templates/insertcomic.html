@@ -2,10 +2,59 @@
 <html>
 
 <head>
-    <title>Ver PDF</title>
+    <title>Registrar Compra</title>
 
 
     <link rel="stylesheet" href="{{ url_for('static', filename='mostrarpdf.css') }}">
+
+
+    <style>
+        .formulario-subida {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fdfdfd;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .formulario-subida input[type="text"],
+        .formulario-subida input[type="number"],
+        .formulario-subida input[type="file"],
+        .formulario-subida textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .formulario-subida textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #568ad8;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-submit:hover {
+            background-color: #218838;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -26,54 +75,33 @@
             </svg>
         </div>
         <ul class="nav-list">
-            <li><a href="#hogar">Hogar</a></li>
-            <li><a href="{{ url_for('sobre') }}">Sobre</a></li>
-            <li><a href="{{ url_for('servicios') }}">Servicio</a></li>
-            <li><a href="{{ url_for('catalogo') }}">Catalogo</a></li>
-            <li><a href="{{ url_for('contacto') }}">Contacto</a></li>
 
-            <li><a href="{{ url_for('listar_compras') }}">compras</a></li>
-             <li> <a href="{{ url_for('mostrar_usuarios') }}">Usuarios</a></li>
+            <li><a href="{{ url_for('comic_form') }}">Subir</a></li>
+            <li><a href="{{ url_for('listar_compras1') }}">Listar compra</a></li>
+            <li><a href="{{ url_for('mostrar_usuarios1') }}">Listar usuarios</a></li>
+
         </ul>
     </nav>
 
-
     <main class="main-content">
-        <h1 class="big-title">El baúl cómico</h1>
+        <h1 class="big-title">Insertar comic </h1>
 
-        <div class="content-section">
-            <p>Bienvenido a un mundo lleno de historias ilustradas.</p>
-        </div>
 
-        <div class="cards-container">
-            {% if comics %}
-            {% for comic in comics %}
-            <div class="card">
-                <h3>{{ comic[1] }}</h3> <!-- Título -->
-                <p>{{ comic[3] }}</p> <!-- Descripción -->
-                <p><strong>Precio:</strong> ${{ comic[4] }}</p><br><br>
-                <a href="{{ comic[2] }}" target="_blank" class="ver-pdf-btn">Ver PDF</a>
-                <a href="{{ url_for('nueva_compra', idcomic=comic[0]) }}" class="ver-pdf-btn">Comprar</a>
+        <form action="/insertar_comic" method="POST" enctype="multipart/form-data" class="formulario-subida">
+            <input type="text" name="titulo" placeholder="Título del cómic" required class="form-input"><br>
 
-                <!-- Puedes cambiar "Ver PDF" por "Comprar" si estás llevando a otra vista -->
-            </div>
-            {% endfor %}
-            {% else %}
-            <p style="text-align: center;">No hay cómics disponibles por el momento.</p>
-            {% endif %}
-        </div>
+            <textarea name="descrip" placeholder="Descripción" class="form-textarea"></textarea><br>
 
-        <div class="content-section">
-            <h2>Bienvenido a la sección de historietas</h2>
-            <p>
-                Sumérgete en un universo lleno de aventuras, humor, acción y emoción.
-                Aquí encontrarás cómics para todos los gustos: desde héroes urbanos y animales parlantes
-                hasta mundos futuristas y tramas fantásticas.
-            </p>
-        </div>
+            <input type="number" step="0.01" name="precio" placeholder="Precio" required class="form-input"><br>
+
+            <input type="file" name="archivo" accept=".pdf" required class="form-file"><br>
+
+            <button type="submit" class="form-submit">📤 Subir Cómic</button>
+        </form>
+
+
+
     </main>
-
-
 
     <svg id="svgfilters2" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
         xmlns:svgjs="http://svgjs.dev/svgjs" viewBox="0 0 700 700" width="700" height="700">
@@ -96,13 +124,9 @@
 
 
 
-
-
-
-
-
-
-
 </body>
 
 </html>
+
+
+

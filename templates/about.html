@@ -32,7 +32,8 @@
             <li><a href="{{ url_for('servicios') }}">Servicio</a></li>
             <li><a href="{{ url_for('catalogo') }}">Catalogo</a></li>
             <li><a href="{{ url_for('contacto') }}">Contacto</a></li>
-
+            <li><a href="{{ url_for('listar_compras') }}">compras</a></li>
+            <li> <a href="{{ url_for('mostrar_usuarios') }}">Usuarios</a></li>
 
         </ul>
     </nav>
@@ -57,43 +58,6 @@
             Gracias por acompañarnos en este viaje lleno de aventuras, emoción y creatividad. ¡Bienvenido al baúl,
             donde cada historieta tiene su lugar!
         </p>
-        <!-- </div> -->
-
-        <!-- <div class="cards-container">
-            <div class="card">
-                <h3>Spiderman</h3>
-                <p>Sinopsis de Hombre Araña
-                    Un hombre común obtiene poderes arácnidos tras un accidente y decide usarlos para proteger su ciudad
-                    del crimen. Pero mantener su doble vida y enfrentar peligros lo llevará al límite..</p>
-                 <iframe src="{{ url }}" width="100%" height="600px"></iframe> 
-                <img src="./static/img.jpg" height="90" width="100">
-
-                <br><br>
-                <a href="{{ url }}" target="_blank" class="ver-pdf-btn">COMPRAR</a>
-
-            </div>
-            <div class="card">
-                <h3>Batman</h3>
-                <p>Después de presenciar el asesinato de sus padres, Bruce Wayne jura vengar la injusticia que cambió
-                    su vida. Con la oscuridad como aliada y Gotham como su campo de batalla , se convierte en Batman...</p>
-                <br><br>
-                <a href="{{ url }}" target="_blank" class="ver-pdf-btn">Ver PDF</a>
-            </div>
-            <div class="card">
-                <h3>Snoopy</h3>
-                <p>Snoopy es un beagle soñador con una imaginación desbordante. Aunque parece un perro común, en su
-                    mente es un aviador de la Primera Guerra Mundial, un escritor famoso y todo lo que se proponga. Vive en su ...</p>
-                     <br><br>
-                <a href="{{ url }}" target="_blank" class="ver-pdf-btn">Ver PDF</a>
-            </div>
-        </div>
-
-        <div class="content-section">
-            <h2>Bienvenido a la sección de historietas</h2>
-            <p>Sumérgete en un universo lleno de aventuras, humor, acción y emoción. Aquí encontrarás cómics para todos
-                los gustos: desde héroes urbanos y animales parlantes hasta mundos futuristas y tramas fantásticas.</p>
-
-        </div> -->
     </main>
 
 
@@ -122,7 +86,14 @@
 
 
 
-
+    <!-- <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('mostrar_usuarios') }}">
+            <button
+                style="padding: 10px 20px; font-size: 16px; background-color: #03beb7; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Ver usuarios registrados
+            </button>
+        </a>
+    </div> -->
 
 
 

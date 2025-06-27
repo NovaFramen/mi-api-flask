@@ -2,16 +2,37 @@
 <html>
 
 <head>
-    <title>Ver PDF</title>
+    <title>Usuarios Registrados</title>
 
 
     <link rel="stylesheet" href="{{ url_for('static', filename='mostrarpdf.css') }}">
+
+<style>
+    table {
+      border-collapse: collapse;
+      width: 60%;
+      margin: 20px auto;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    body {
+      font-family: Arial, sans-serif;
+     
+    }
+    </style>
+
 </head>
 
 <body>
 
 
-    <nav class="navbar">
+  <nav class="navbar">
         <div class="logo">
             <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd"
                 viewBox="0 0 135 135">
@@ -26,54 +47,33 @@
             </svg>
         </div>
         <ul class="nav-list">
-            <li><a href="#hogar">Hogar</a></li>
-            <li><a href="{{ url_for('sobre') }}">Sobre</a></li>
-            <li><a href="{{ url_for('servicios') }}">Servicio</a></li>
-            <li><a href="{{ url_for('catalogo') }}">Catalogo</a></li>
-            <li><a href="{{ url_for('contacto') }}">Contacto</a></li>
 
-            <li><a href="{{ url_for('listar_compras') }}">compras</a></li>
-             <li> <a href="{{ url_for('mostrar_usuarios') }}">Usuarios</a></li>
+            <li><a href="{{ url_for('comic_form') }}">Subir</a></li>
+            <li><a href="{{ url_for('listar_compras1') }}">Listar compra</a></li>
+            <li><a href="{{ url_for('mostrar_usuarios1') }}">Listar usuarios</a></li>
+
         </ul>
     </nav>
 
-
     <main class="main-content">
-        <h1 class="big-title">El baúl cómico</h1>
+        <h1 class="big-title">Usuarios Registrados</h1>
 
-        <div class="content-section">
-            <p>Bienvenido a un mundo lleno de historias ilustradas.</p>
-        </div>
+ <table>
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+    </tr>
+    {% for usuario in usuarios %}
+    <tr>
+      <td>{{ usuario[0] }}</td>
+      <td>{{ usuario[1] }}</td>
+      <td>{{ usuario[2] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
 
-        <div class="cards-container">
-            {% if comics %}
-            {% for comic in comics %}
-            <div class="card">
-                <h3>{{ comic[1] }}</h3> <!-- Título -->
-                <p>{{ comic[3] }}</p> <!-- Descripción -->
-                <p><strong>Precio:</strong> ${{ comic[4] }}</p><br><br>
-                <a href="{{ comic[2] }}" target="_blank" class="ver-pdf-btn">Ver PDF</a>
-                <a href="{{ url_for('nueva_compra', idcomic=comic[0]) }}" class="ver-pdf-btn">Comprar</a>
 
-                <!-- Puedes cambiar "Ver PDF" por "Comprar" si estás llevando a otra vista -->
-            </div>
-            {% endfor %}
-            {% else %}
-            <p style="text-align: center;">No hay cómics disponibles por el momento.</p>
-            {% endif %}
-        </div>
-
-        <div class="content-section">
-            <h2>Bienvenido a la sección de historietas</h2>
-            <p>
-                Sumérgete en un universo lleno de aventuras, humor, acción y emoción.
-                Aquí encontrarás cómics para todos los gustos: desde héroes urbanos y animales parlantes
-                hasta mundos futuristas y tramas fantásticas.
-            </p>
-        </div>
     </main>
-
-
 
     <svg id="svgfilters2" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
         xmlns:svgjs="http://svgjs.dev/svgjs" viewBox="0 0 700 700" width="700" height="700">
@@ -93,13 +93,6 @@
         <rect width="700" height="700" fill="#1c1818ff"></rect>
         <rect width="700" height="700" fill="#dfdde1" filter="url(#nnnoise-filter)"></rect>
     </svg>
-
-
-
-
-
-
-
 
 
 

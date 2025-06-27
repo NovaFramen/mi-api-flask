@@ -1,0 +1,17 @@
+{% if comics %}
+    <ul>
+    {% for comic in comics %}
+        <li>
+            <h3>{{ comic[1] }}</h3>
+            <!-- <h3>{{ comic[2] }}</h3> -->
+            <p>{{ comic[3] }}</p>
+            <p>Precio: ${{ comic[4] }}</p>
+            <a href="{{ comic[2] }}" target="_blank">Ver PDF</a>
+        </li>
+    {% else %}
+        <p>La lista está vacía.</p>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No hay cómics disponibles.</p>
+{% endif %}
