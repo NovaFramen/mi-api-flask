@@ -5,6 +5,7 @@ import psycopg2,uuid
 import json
 import requests
 import os
+from yt_dlp import YoutubeDL
 
 
 app = Flask(__name__)
@@ -627,6 +628,77 @@ def reset_usuarios():
     cur.close()
     conn.close()
     return jsonify({"mensaje": "Todos los usuarios eliminados y contador reiniciado"})
+
+
+
+
+@app.route('/create_descargas')
+def create_descargas():
+    conn = get_db_connection0()
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS descargas (
+            id SERIAL PRIMARY KEY,
+            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            video_url TEXT NOT NULL,
+            nombre_archivo TEXT NOT NULL
+        );
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"mensaje": "Tabla descargas creada o ya existente"})
+
+
+
+
+
+
+from datetime import datetime
+
+
+@app.route('/registrar_descarga', methods=['POST'])
+def registrar_descarga():
+    video_url = request.form.get('video_url')
+
+    try:
+        # Crear carpeta "videos" si no existe
+        os.makedirs("videos", exist_ok=True)
+
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        base_filename = f"video_{timestamp}.%(ext)s"
+
+        ydl_opts = {
+            'outtmpl': os.path.join("videos", base_filename),
+            'format': 'best',
+        }
+
+        with YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=True)
+            actual_filename = ydl.prepare_filename(info)
+
+        conn = get_db_connection0()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO descargas (video_url, nombre_archivo)
+            VALUES (%s, %s);
+        """, (video_url, actual_filename))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify({"mensaje": "Video descargado correctamente ✅"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+@app.route('/descarga')
+def descarga_form():
+    return render_template('insert_descargas.html')
+
+
 
 
 
