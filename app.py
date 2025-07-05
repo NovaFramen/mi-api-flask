@@ -664,17 +664,20 @@ from datetime import datetime
 from yt_dlp import YoutubeDL
 
 
+
 @app.route('/registrar_descarga', methods=['POST'])
 def registrar_descarga():
     video_url = request.form.get('video_url')
 
     try:
-        # Crear directorio temporal
+        
         with tempfile.TemporaryDirectory() as tmpdir:
             ydl_opts = {
                 'format': 'best',
                 'quiet': True,
                 'outtmpl': os.path.join(tmpdir, 'video.%(ext)s'),
+                'nocheckcertificate': True,
+                'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
             }
 
             with YoutubeDL(ydl_opts) as ydl:
@@ -683,7 +686,7 @@ def registrar_descarga():
                 extension = info.get('ext', 'mp4')
                 direct_url = info.get('url')
 
-        # Guardar en la base de datos
+        # Guardar en BD
         conn = get_db_connection0()
         cur = conn.cursor()
         cur.execute("""
@@ -694,8 +697,11 @@ def registrar_descarga():
         cur.close()
         conn.close()
 
-        # Descargar el contenido del video en memoria
-        response = requests.get(direct_url)
+        # Descargar el archivo
+        response = requests.get(direct_url, headers={
+            'User-Agent': ydl_opts['user_agent']
+        }, timeout=10)
+
         if response.status_code == 200:
             return send_file(
                 BytesIO(response.content),
@@ -704,10 +710,14 @@ def registrar_descarga():
                 download_name=f'{video_title}.{extension}'
             )
         else:
-            return "No se pudo descargar el archivo", 500
+            return render_template("index.html", error="Este video está bloqueado o no se puede descargar desde el servidor.")
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        error_msg = str(e)
+        # Verificar si el error parece ser un bloqueo
+        if "403" in error_msg or "denied" in error_msg.lower() or "unauthorized" in error_msg.lower():
+            return render_template("index.html", error="Este video está bloqueado o no está disponible públicamente.")
+        return render_template("index.html", error=f"Error inesperado: {error_msg}")
 
 
 
