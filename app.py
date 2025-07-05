@@ -1,10 +1,12 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, request, jsonify, render_template,redirect,url_for,session
+from flask import Flask,  request, jsonify, render_template,redirect,url_for,session
 from supabase import create_client, Client
 import psycopg2,uuid
 import json
 import requests
 import os
+from flask import send_file
+from io import BytesIO
 from yt_dlp import YoutubeDL
 
 
@@ -656,41 +658,57 @@ def create_descargas():
 
 from datetime import datetime
 
+import tempfile
+from flask import redirect, session
+from datetime import datetime
+from yt_dlp import YoutubeDL
+
 
 @app.route('/registrar_descarga', methods=['POST'])
 def registrar_descarga():
     video_url = request.form.get('video_url')
 
     try:
-        # Crear carpeta "videos" si no existe
-        os.makedirs("videos", exist_ok=True)
+        # Obtener la URL directa del video sin descargarlo
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ydl_opts = {
+                'format': 'best',
+                'quiet': True,
+                'outtmpl': os.path.join(tmpdir, 'video.%(ext)s'),
+            }
 
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        base_filename = f"video_{timestamp}.%(ext)s"
+            with YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(video_url, download=False)
+                video_title = info.get('title', 'video')
+                extension = info.get('ext', 'mp4')
+                direct_url = info.get('url')  # ⚠️ Puede expirar después de un rato
 
-        ydl_opts = {
-            'outtmpl': os.path.join("videos", base_filename),
-            'format': 'best',
-        }
-
-        with YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=True)
-            actual_filename = ydl.prepare_filename(info)
-
+        # Guardar info en la base de datos sin user_id (porque no hay sesión)
         conn = get_db_connection0()
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO descargas (video_url, nombre_archivo)
-            VALUES (%s, %s);
-        """, (video_url, actual_filename))
+            INSERT INTO descargas (video_url, nombre_archivo, fecha)
+            VALUES (%s, %s, %s);
+        """, (video_url, f"{video_title}.{extension}", datetime.now()))
         conn.commit()
         cur.close()
         conn.close()
 
-        return jsonify({"mensaje": "Video descargado correctamente ✅"})
+        # Descargar y enviar el video directamente (sin redirigir)
+        response = requests.get(direct_url)
+        if response.status_code == 200:
+            return send_file(
+                BytesIO(response.content),
+                mimetype='video/mp4',  # o 'application/octet-stream' si prefieres
+                as_attachment=True,
+                download_name=f'{video_title}.{extension}'
+            )
+        else:
+            return "No se pudo descargar el archivo", 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 
