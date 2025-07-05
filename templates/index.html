@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Descargar Video</title>
+</head>
+<body>
+    <h2>Formulario de Descarga de Video</h2>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <form action="/registrar_descarga" method="post">
+        <label for="video_url">URL del Video de YouTube:</label>
+        <input type="url" name="video_url" required><br><br>
+        <button type="submit">Descargar</button>
+    </form>
+</body>
+</html>
