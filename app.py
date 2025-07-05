@@ -1,5 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask,  request, jsonify, render_template,redirect,url_for,session
+from flask import Flask, after_this_request,  request, jsonify, render_template,redirect,url_for,session
 from supabase import create_client, Client
 import psycopg2,uuid
 import json
@@ -429,7 +429,7 @@ def mostrar_usuarios():
     conn.close()
     
     return render_template('usuarios.html', usuarios=usuarios)
-
+ 
 
 
 @app.route('/usuarios1')
@@ -663,63 +663,45 @@ from flask import redirect, session
 from datetime import datetime
 from yt_dlp import YoutubeDL
 
-
-
-@app.route('/registrar_descarga', methods=['POST'])
+@app.route("/registrar_descarga", methods=["POST"])
 def registrar_descarga():
-    video_url = request.form.get('video_url')
+    video_url = request.form.get("video_url")
+    
+    # Crear nombre y ruta temporal para el video
+    filename = f"{uuid.uuid4()}.mp4"
+    filepath = os.path.join("/tmp", filename) if os.name != 'nt' else filename
+
+    ydl_opts = {
+        'format': 'best',
+        'outtmpl': filepath,
+        'quiet': True,
+        'nocheckcertificate': True,
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+    }
 
     try:
-        
-        with tempfile.TemporaryDirectory() as tmpdir:
-            ydl_opts = {
-                'format': 'best',
-                'quiet': True,
-                'outtmpl': os.path.join(tmpdir, 'video.%(ext)s'),
-                'nocheckcertificate': True,
-                'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-            }
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([video_url])
 
-            with YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(video_url, download=False)
-                video_title = info.get('title', 'video')
-                extension = info.get('ext', 'mp4')
-                direct_url = info.get('url')
+        # ✅ Borrar el archivo después de enviarlo al cliente
+        @after_this_request
+        def cleanup(response):
+            try:
+                os.remove(filepath)
+            except Exception as e:
+                print(f"Error eliminando archivo: {e}")
+            return response
 
-        # Guardar en BD
-        conn = get_db_connection0()
-        cur = conn.cursor()
-        cur.execute("""
-            INSERT INTO descargas (video_url, nombre_archivo, fecha)
-            VALUES (%s, %s, %s);
-        """, (video_url, f"{video_title}.{extension}", datetime.now()))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        # Descargar el archivo
-        response = requests.get(direct_url, headers={
-            'User-Agent': ydl_opts['user_agent']
-        }, timeout=10)
-
-        if response.status_code == 200:
-            return send_file(
-                BytesIO(response.content),
-                mimetype='video/mp4',
-                as_attachment=True,
-                download_name=f'{video_title}.{extension}'
-            )
-        else:
-            return render_template("index.html", error="Este video está bloqueado o no se puede descargar desde el servidor.")
+        return send_file(
+            filepath,
+            as_attachment=True,
+            download_name='video.mp4',
+            mimetype='video/mp4'
+        )
 
     except Exception as e:
-        error_msg = str(e)
-        # Verificar si el error parece ser un bloqueo
-        if "403" in error_msg or "denied" in error_msg.lower() or "unauthorized" in error_msg.lower():
-            return render_template("index.html", error="Este video está bloqueado o no está disponible públicamente.")
-        return render_template("index.html", error=f"Error inesperado: {error_msg}")
-
-
+        return render_template("index.html", error=f"Error al descargar: {str(e)}")
+    
 
 
 @app.route('/descarga')
