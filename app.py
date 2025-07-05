@@ -669,7 +669,7 @@ def registrar_descarga():
     video_url = request.form.get('video_url')
 
     try:
-        # Obtener la URL directa del video sin descargarlo
+        # Crear directorio temporal
         with tempfile.TemporaryDirectory() as tmpdir:
             ydl_opts = {
                 'format': 'best',
@@ -681,9 +681,9 @@ def registrar_descarga():
                 info = ydl.extract_info(video_url, download=False)
                 video_title = info.get('title', 'video')
                 extension = info.get('ext', 'mp4')
-                direct_url = info.get('url')  # ⚠️ Puede expirar después de un rato
+                direct_url = info.get('url')
 
-        # Guardar info en la base de datos sin user_id (porque no hay sesión)
+        # Guardar en la base de datos
         conn = get_db_connection0()
         cur = conn.cursor()
         cur.execute("""
@@ -694,12 +694,12 @@ def registrar_descarga():
         cur.close()
         conn.close()
 
-        # Descargar y enviar el video directamente (sin redirigir)
+        # Descargar el contenido del video en memoria
         response = requests.get(direct_url)
         if response.status_code == 200:
             return send_file(
                 BytesIO(response.content),
-                mimetype='video/mp4',  # o 'application/octet-stream' si prefieres
+                mimetype='video/mp4',
                 as_attachment=True,
                 download_name=f'{video_title}.{extension}'
             )
