@@ -665,43 +665,40 @@ from yt_dlp import YoutubeDL
 
 @app.route("/registrar_descarga", methods=["POST"])
 def registrar_descarga():
+  
     video_url = request.form.get("video_url")
-    
-    # Crear nombre y ruta temporal para el video
-    filename = f"{uuid.uuid4()}.mp4"
-    filepath = os.path.join("/tmp", filename) if os.name != 'nt' else filename
+    if not video_url:
+        return render_template("index.html", error="Por favor ingresa una URL válida.")
+
+    video_id = str(uuid.uuid4())
+    filepath_template = f"{video_id}.%(ext)s"
+    filepath_mp4 = f"{video_id}.mp4"
 
     ydl_opts = {
-        'format': 'best',
-        'outtmpl': filepath,
-        'quiet': True,
-        'nocheckcertificate': True,
-        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        "format": "best",
+        "outtmpl": filepath_template,
+        "merge_output_format": "mp4",
+        "quiet": True,
+        "cookiefile": "cookies.txt",
     }
 
     try:
         with YoutubeDL(ydl_opts) as ydl:
             ydl.download([video_url])
 
-        # ✅ Borrar el archivo después de enviarlo al cliente
         @after_this_request
         def cleanup(response):
             try:
-                os.remove(filepath)
+                if os.path.exists(filepath_mp4):
+                    os.remove(filepath_mp4)
             except Exception as e:
                 print(f"Error eliminando archivo: {e}")
             return response
 
-        return send_file(
-            filepath,
-            as_attachment=True,
-            download_name='video.mp4',
-            mimetype='video/mp4'
-        )
+        return send_file(filepath_mp4, as_attachment=True)
 
     except Exception as e:
-        return render_template("index.html", error=f"Error al descargar: {str(e)}")
-    
+        return render_template("index.html", error=f"Error al descargar: {e}")
 
 
 @app.route('/descarga')
