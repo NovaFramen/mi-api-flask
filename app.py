@@ -666,40 +666,30 @@ from yt_dlp import YoutubeDL
 @app.route("/registrar_descarga", methods=["POST"])
 def registrar_descarga():
   
-    video_url = request.form.get("video_url")
-    if not video_url:
-        return render_template("index.html", error="Por favor ingresa una URL válida.")
-
-    video_id = str(uuid.uuid4())
-    filepath_template = f"{video_id}.%(ext)s"
-    filepath_mp4 = f"{video_id}.mp4"
-
+    url = request.form['video_url']
+    filepath_template = "/tmp/video.%(ext)s"
+    
     ydl_opts = {
         "format": "best",
         "outtmpl": filepath_template,
         "merge_output_format": "mp4",
         "quiet": True,
-        "cookiefile": "cookies.txt",
     }
 
+    if os.getenv("USE_COOKIES", "false").lower() == "true":
+        ydl_opts["cookiefile"] = "cookies.txt"
+
     try:
-        with YoutubeDL(ydl_opts) as ydl:
-            ydl.download([video_url])
-
-        @after_this_request
-        def cleanup(response):
-            try:
-                if os.path.exists(filepath_mp4):
-                    os.remove(filepath_mp4)
-            except Exception as e:
-                print(f"Error eliminando archivo: {e}")
-            return response
-
-        return send_file(filepath_mp4, as_attachment=True)
-
+        import yt_dlp
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        return "Descarga completada"
     except Exception as e:
-        return render_template("index.html", error=f"Error al descargar: {e}")
+        return f"Error al descargar: {e}"
+    
 
+
+    
 
 @app.route('/descarga')
 def descarga_form():

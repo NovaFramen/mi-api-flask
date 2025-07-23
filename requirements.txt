@@ -3,4 +3,4 @@ psycopg2-binary
 supabase
 gunicorn
 requests
-yt_dlp
+yt-dlp

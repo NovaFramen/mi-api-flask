@@ -4,4 +4,8 @@ services:
     env: python
     plan: free
     buildCommand: ""
-    startCommand: python app.py
+    
+    startCommand: bash start.sh
+    envVars:
+      - key: USE_COOKIES
+        value: "false"
