@@ -669,13 +669,14 @@ def registrar_descarga():
     url = request.form['video_url']
     filepath_template = "/tmp/video.%(ext)s"
     
+   
     ydl_opts = {
-        "format": "best",
-        "outtmpl": filepath_template,
-        "merge_output_format": "mp4",
-        "quiet": True,
-    }
-
+    "format": "best",
+    "outtmpl": filepath_template,
+    "merge_output_format": "mp4",
+    "quiet": True,
+    "cookiefile": "cookies.txt",
+     }
     if os.getenv("USE_COOKIES", "false").lower() == "true":
         ydl_opts["cookiefile"] = "cookies.txt"
 
